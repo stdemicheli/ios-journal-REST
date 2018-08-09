@@ -68,6 +68,28 @@ class EntryController {
         }.resume()
     }
     
+    func delete(entry: Entry, completion: @escaping (Error?) -> Void) {
+        let url = baseURL
+            .appendingPathComponent(entry.identifier)
+            .appendingPathExtension("json")
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTPMethod.delete.rawValue
+        
+        URLSession.shared.dataTask(with: request) { (data, _, error) in
+            if let error = error {
+                NSLog("Error fetching data: \(error)")
+                completion(error)
+                return
+            }
+            
+            guard let index = self.entries.index(of: entry) else { return }
+            self.entries.remove(at: index)
+            
+            completion(nil)
+        }.resume()
+    }
+    
     func put(entry: Entry, completion: @escaping (Error?) -> Void) {
         let url = baseURL
             .appendingPathComponent(entry.identifier)

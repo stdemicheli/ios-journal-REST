@@ -44,22 +44,35 @@ class EntriesTableViewController: UITableViewController {
         return cell
     }
 
-    // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+            let entry = entryController.entries[indexPath.row]
+            entryController.delete(entry: entry) { (error) in
+                if let error = error {
+                    NSLog("Error deleting data: \(error)")
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    self.tableView.deleteRows(at: [indexPath], with: .fade)
+                }
+            }
+        }
     }
 
     // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "ShowAddNewEntryDetail" {
+            guard let addNewEntryVC = segue.destination as? EntryDetailViewController else { return }
+            addNewEntryVC.entryController = entryController
+        } else if segue.identifier == "ShowEntryDetail" {
+            guard let detailVC = segue.destination as? EntryDetailViewController,
+                let indexPath = tableView.indexPathForSelectedRow else { return }
+            let entry = entryController.entries[indexPath.row]
+            detailVC.entryController = entryController
+            detailVC.entry = entry
+        }
     }
     
     let entryController = EntryController()

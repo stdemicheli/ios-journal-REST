@@ -12,38 +12,57 @@ class EntryDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        updateViews()
     }
     
     // MARK: - Methods
     
     @IBAction func save(_ sender: Any) {
-//        let entry = Entry(title: "My second entry", bodyText: "A beautiful entry")
-//        entryController.put(entry: entry) { (error) in
-//            if let error = error {
-//                NSLog("Error fetching data: \(error)")
-//                return
-//            }
-//
-//            DispatchQueue.main.async {
-//                self.tableView.reloadData()
-//            }
-//        }
+        guard let title = titleTextField.text, let body = bodyTextView.text else { return }
+        if let entry = entry {
+            entryController?.update(entry: entry, title: title, body: body, completion: { (error) in
+                if let error = error {
+                    NSLog("Error updating entry: \(error)")
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    self.navigationController?.popViewController(animated: true)
+                }
+            })
+        } else {
+            entryController?.createEntry(with: title, body: body, completion: { (error) in
+                if let error = error {
+                    NSLog("Error creating entry: \(error)")
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    self.navigationController?.popViewController(animated: true)
+                }
+            })
+        }
     }
     
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    private func updateViews() {
+        if self.isViewLoaded {
+            if let entry = entry {
+                title = entry.title
+                titleTextField.text = entry.title
+                bodyTextView.text = entry.bodyText
+            }
+            
+            title = "Create Entry"
+        }
     }
-    */
+    
     // MARK: - Properties
     
-    var entry: Entry?
+    var entry: Entry? {
+        didSet {
+            updateViews()
+        }
+    }
     var entryController: EntryController?
     
     @IBOutlet weak var titleTextField: UITextField!

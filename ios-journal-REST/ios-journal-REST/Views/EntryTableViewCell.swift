@@ -13,7 +13,7 @@ class EntryTableViewCell: UITableViewCell {
     
     // MARK: - Methods
     
-    func updateViews() {
+    private func updateViews() {
         guard let entry = entry else { return }
         titleTextLabel?.text = entry.title
         bodyTextLabel?.text = entry.bodyText
