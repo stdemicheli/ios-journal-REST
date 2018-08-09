@@ -19,6 +19,17 @@ class EntryDetailViewController: UIViewController {
     // MARK: - Methods
     
     @IBAction func save(_ sender: Any) {
+//        let entry = Entry(title: "My second entry", bodyText: "A beautiful entry")
+//        entryController.put(entry: entry) { (error) in
+//            if let error = error {
+//                NSLog("Error fetching data: \(error)")
+//                return
+//            }
+//
+//            DispatchQueue.main.async {
+//                self.tableView.reloadData()
+//            }
+//        }
     }
     
     /*
@@ -31,6 +42,9 @@ class EntryDetailViewController: UIViewController {
     }
     */
     // MARK: - Properties
+    
+    var entry: Entry?
+    var entryController: EntryController?
     
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var bodyTextView: UITextView!
