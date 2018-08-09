@@ -22,7 +22,7 @@ class EntryController {
     func createEntry(with title: String, body: String, completion: @escaping (Error?) -> Void) {
         let entry = Entry(title: title, bodyText: body)
         // Call put, and insert completion in the parameter: will forward the completion closure to the function caller
-        put(entry: entry, completion: completion)
+        post(entry: entry, completion: completion)
     }
     
     func update(entry: Entry, title: String, body: String, completion: @escaping (Error?) -> Void) {
@@ -35,7 +35,7 @@ class EntryController {
         entries.remove(at: index)
         entries.insert(updatedEntry, at: index)
         
-        put(entry: updatedEntry, completion: completion)
+        post(entry: updatedEntry, completion: completion)
     }
     
     func fetchEntries(completion: @escaping (Error?) -> Void) {
@@ -57,8 +57,9 @@ class EntryController {
             }
             
             do {
-                let decodedEntriesDicts = try JSONDecoder().decode([String: Entry].self, from: data)
-                self.entries = decodedEntriesDicts.map { $0.value }.sorted { $0.timestamp < $1.timestamp }
+                // Would need to be changed to decode([String: Entry].self, ...)
+                let decodedEntriesDicts = try JSONDecoder().decode([String: [String: Entry]].self, from: data).values
+                self.entries = decodedEntriesDicts.flatMap { $0.values }
                 completion(nil)
             } catch {
                 NSLog("Error while decoding data: \(error)")
@@ -85,6 +86,34 @@ class EntryController {
             
             guard let index = self.entries.index(of: entry) else { return }
             self.entries.remove(at: index)
+            
+            completion(nil)
+        }.resume()
+    }
+    
+    func post(entry: Entry, completion: @escaping (Error?) -> Void) {
+        let url = baseURL
+            .appendingPathComponent(entry.identifier)
+            .appendingPathExtension("json")
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTPMethod.post.rawValue
+        
+        do {
+            let encodedEntry = try JSONEncoder().encode(entry)
+            request.httpBody = encodedEntry
+        } catch {
+            NSLog("Error while encoding data for \(entry): \(error)")
+            completion(error)
+            return
+        }
+        
+        URLSession.shared.dataTask(with: request) { (data, _, error) in
+            if let error = error {
+                NSLog("Error fetching data: \(error)")
+                completion(error)
+                return
+            }
             
             completion(nil)
         }.resume()
