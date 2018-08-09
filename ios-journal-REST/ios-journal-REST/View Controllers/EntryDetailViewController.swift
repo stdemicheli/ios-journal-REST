@@ -28,7 +28,7 @@ class EntryDetailViewController: UIViewController {
                     NSLog("Error updating entry: \(error)")
                     return
                 }
-                
+
                 DispatchQueue.main.async {
                     self.navigationController?.popViewController(animated: true)
                 }

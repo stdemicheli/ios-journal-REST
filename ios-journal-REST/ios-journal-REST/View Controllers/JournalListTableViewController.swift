@@ -40,6 +40,7 @@ class JournalListTableViewController: UITableViewController {
             
             DispatchQueue.main.async {
                 self.tableView.reloadData()
+                self.journalTextField?.text = ""
             }
         }
     }
