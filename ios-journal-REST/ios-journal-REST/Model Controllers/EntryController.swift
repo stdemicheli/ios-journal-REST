@@ -19,23 +19,62 @@ class EntryController {
     
     // MARK: - Methods
     
-    func createEntry(with title: String, body: String, completion: @escaping (Error?) -> Void) {
-        let entry = Entry(title: title, bodyText: body)
-        // Call put, and insert completion in the parameter: will forward the completion closure to the function caller
-        post(entry: entry, completion: completion)
+    func createJournal(with title: String, completion: @escaping (Error?) -> Void) {
+        let journal = Journal(title: title)
+        put(journal: journal, entry: nil, completion: completion)
     }
     
-    func update(entry: Entry, title: String, body: String, completion: @escaping (Error?) -> Void) {
-        guard let index = entries.index(of: entry) else { return }
-        var updatedEntry = entries[index]
+    func createEntry(with title: String, body: String, in journal: Journal, completion: @escaping (Error?) -> Void) {
+        let entry = Journal.Entry(title: title, bodyText: body)
+        // Call put, and insert completion in the parameter: will forward the completion closure to the function caller
+        put(journal: journal, entry: entry, completion: completion)
+    }
+    
+    func update(journal: Journal, entry: Journal.Entry, title: String, body: String, completion: @escaping (Error?) -> Void) {
+        
+        guard let entryIndex = journal.entries.index(of: entry),
+            let journalIndex = journals.index(of: journal) else { return }
+        
+        var updatedEntry = journal.entries[entryIndex]
         updatedEntry.title = title
         updatedEntry.bodyText = body
         updatedEntry.timestamp = Date()
         
-        entries.remove(at: index)
-        entries.insert(updatedEntry, at: index)
+        journals.remove(at: journalIndex)
+        journals.insert(journal, at: journalIndex)
         
-        post(entry: updatedEntry, completion: completion)
+        put(journal: journal, entry: nil, completion: completion)
+    }
+    
+    func fetchJournals(completion: @escaping (Error?) -> Void) {
+        let url = baseURL.appendingPathExtension("json")
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTPMethod.get.rawValue
+        
+        URLSession.shared.dataTask(with: request) { (data, _, error) in
+            if let error = error {
+                NSLog("Error fetching data: \(error)")
+                completion(error)
+                return
+            }
+            
+            guard let data = data else {
+                NSLog("Error fetching data")
+                completion(NSError())
+                return
+            }
+            
+            do {
+                // Would need to be changed to decode([String: Entry].self, ...)
+                let decodedEntriesDicts = try JSONDecoder().decode([String : Journal].self, from: data)
+                self.journals = decodedEntriesDicts.map { $0.value }
+                completion(nil)
+            } catch {
+                NSLog("Error while decoding data: \(error)")
+                completion(error)
+                return
+            }
+            }.resume()
     }
     
     func fetchEntries(completion: @escaping (Error?) -> Void) {
@@ -69,10 +108,20 @@ class EntryController {
         }.resume()
     }
     
-    func delete(entry: Entry, completion: @escaping (Error?) -> Void) {
-        let url = baseURL
-            .appendingPathComponent(entry.identifier)
-            .appendingPathExtension("json")
+    func delete(journal: Journal, entry: Journal.Entry?, completion: @escaping (Error?) -> Void) {
+        let url: URL
+        
+        if let entry = entry {
+            url = baseURL
+                .appendingPathComponent(journal.identifier)
+                .appendingPathComponent("entries")
+                .appendingPathComponent(entry.identifier)
+                .appendingPathExtension("json")
+        } else {
+            url = baseURL
+                .appendingPathComponent(journal.identifier)
+                .appendingPathExtension("json")
+        }
         
         var request = URLRequest(url: url)
         request.httpMethod = HTTPMethod.delete.rawValue
@@ -84,13 +133,21 @@ class EntryController {
                 return
             }
             
-            guard let index = self.entries.index(of: entry) else { return }
-            self.entries.remove(at: index)
+            if let entry = entry {
+                guard let journalIndex = self.journals.index(of: journal) else { return }
+                guard let entryIndex = self.journals[journalIndex].entries.index(of: entry) else { return }
+                self.journals[journalIndex].entries.remove(at: entryIndex)
+            } else {
+                guard let journalIndex = self.journals.index(of: journal) else { return }
+                self.journals.remove(at: journalIndex)
+            }
+            
             
             completion(nil)
         }.resume()
     }
     
+    // TODO: Acommodate for posting journals
     func post(entry: Entry, completion: @escaping (Error?) -> Void) {
         let url = baseURL
             .appendingPathComponent(entry.identifier)
@@ -119,19 +176,30 @@ class EntryController {
         }.resume()
     }
     
-    func put(entry: Entry, completion: @escaping (Error?) -> Void) {
-        let url = baseURL
-            .appendingPathComponent(entry.identifier)
-            .appendingPathExtension("json")
+    func put(journal: Journal, entry: Journal.Entry?, completion: @escaping (Error?) -> Void) {
+        let url: URL
+        
+        if let entry = entry {
+            url = baseURL
+                .appendingPathComponent(journal.identifier)
+                .appendingPathComponent("entries")
+                .appendingPathComponent(entry.identifier)
+                .appendingPathExtension("json")
+        } else {
+            url = baseURL
+                .appendingPathComponent(journal.identifier)
+                .appendingPathExtension("json")
+        }
+        
         
         var request = URLRequest(url: url)
         request.httpMethod = HTTPMethod.put.rawValue
         
         do {
-            let encodedEntry = try JSONEncoder().encode(entry)
+            let encodedEntry = try JSONEncoder().encode(journal)
             request.httpBody = encodedEntry
         } catch {
-            NSLog("Error while encoding data for \(entry): \(error)")
+            NSLog("Error while encoding data for: \(error)")
             completion(error)
             return
         }
@@ -148,6 +216,7 @@ class EntryController {
     }
     
     // MARK: - Properties
+    var journals: [Journal] = []
     var entries: [Entry] = []
     let baseURL: URL = URL(string: "https://stefanojournal.firebaseio.com/")!
     

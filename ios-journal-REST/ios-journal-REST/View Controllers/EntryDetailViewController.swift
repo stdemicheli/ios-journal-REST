@@ -18,9 +18,12 @@ class EntryDetailViewController: UIViewController {
     // MARK: - Methods
     
     @IBAction func save(_ sender: Any) {
-        guard let title = titleTextField.text, let body = bodyTextView.text else { return }
+        guard let title = titleTextField.text,
+            let body = bodyTextView.text,
+            let journal = journal else { return }
+        
         if let entry = entry {
-            entryController?.update(entry: entry, title: title, body: body, completion: { (error) in
+            entryController?.update(journal: journal, entry: entry, title: title, body: body, completion: { (error) in
                 if let error = error {
                     NSLog("Error updating entry: \(error)")
                     return
@@ -31,7 +34,7 @@ class EntryDetailViewController: UIViewController {
                 }
             })
         } else {
-            entryController?.createEntry(with: title, body: body, completion: { (error) in
+            entryController?.createEntry(with: title, body: body, in: journal, completion: { (error) in
                 if let error = error {
                     NSLog("Error creating entry: \(error)")
                     return
@@ -57,8 +60,12 @@ class EntryDetailViewController: UIViewController {
     }
     
     // MARK: - Properties
-    
-    var entry: Entry? {
+    var journal: Journal? {
+        didSet {
+            updateViews()
+        }
+    }
+    var entry: Journal.Entry? {
         didSet {
             updateViews()
         }

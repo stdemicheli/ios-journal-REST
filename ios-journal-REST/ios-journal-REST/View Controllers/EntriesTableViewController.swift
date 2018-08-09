@@ -13,9 +13,11 @@ class EntriesTableViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-    entryController.fetchEntries { (error) in
+        guard let entryController = entryController else { return }
+        
+        entryController.fetchEntries { (error) in
             if let error = error {
-                NSLog("Error fetching data: \(error)")
+                NSLog("Error fetching entries: \(error)")
                 return
             }
         
@@ -33,21 +35,25 @@ class EntriesTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return entryController.entries.count
+        return journal?.entries.count ?? 0
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "EntryCell", for: indexPath) as? EntryTableViewCell else { fatalError("Something really really bad happened") }
-
-        cell.entry = entryController.entries[indexPath.row]
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "EntryCell", for: indexPath) as? EntryTableViewCell,
+            let journal = journal else { fatalError("Something really really bad happened") }
+        
+        cell.entry = journal.entries[indexPath.row]
 
         return cell
     }
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let entry = entryController.entries[indexPath.row]
-            entryController.delete(entry: entry) { (error) in
+            guard let entryController = entryController,
+                let journal = journal else { return }
+            
+            let entry = journal.entries[indexPath.row]
+            entryController.delete(journal: journal, entry: entry) { (error) in
                 if let error = error {
                     NSLog("Error deleting data: \(error)")
                     return
@@ -64,17 +70,26 @@ class EntriesTableViewController: UITableViewController {
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowAddNewEntryDetail" {
-            guard let addNewEntryVC = segue.destination as? EntryDetailViewController else { return }
+            guard let addNewEntryVC = segue.destination as? EntryDetailViewController,
+                let entryController = entryController,
+                let journal = journal else { return }
+            
             addNewEntryVC.entryController = entryController
+            addNewEntryVC.journal = journal
+            
         } else if segue.identifier == "ShowEntryDetail" {
             guard let detailVC = segue.destination as? EntryDetailViewController,
-                let indexPath = tableView.indexPathForSelectedRow else { return }
-            let entry = entryController.entries[indexPath.row]
+                let indexPath = tableView.indexPathForSelectedRow,
+                let entryController = entryController,
+                let journal = journal else { return }
+            
+            let entry = journal.entries[indexPath.row]
             detailVC.entryController = entryController
             detailVC.entry = entry
         }
     }
     
-    let entryController = EntryController()
+    var journal: Journal?
+    var entryController: EntryController?
 
 }

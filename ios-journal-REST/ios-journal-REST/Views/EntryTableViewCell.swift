@@ -28,7 +28,7 @@ class EntryTableViewCell: UITableViewCell {
     
     // MARK: - Properties
     
-    var entry: Entry? {
+    var entry: Journal.Entry? {
         didSet {
             updateViews()
         }
