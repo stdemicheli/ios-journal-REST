@@ -13,11 +13,17 @@ class EntriesTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        let entry = Entry(title: "My second entry", bodyText: "A beautiful entry")
+        entryController.put(entry: entry) { (error) in
+            if let error = error {
+                NSLog("Error fetching data: \(error)")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
     }
 
     // MARK: - Table view data source
@@ -86,5 +92,7 @@ class EntriesTableViewController: UITableViewController {
         // Pass the selected object to the new view controller.
     }
     */
+    
+    var entryController = EntryController()
 
 }

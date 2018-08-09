@@ -10,6 +10,8 @@
 		3D0F000B211CA2BD005D0DA2 /* EntriesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0F000A211CA2BD005D0DA2 /* EntriesTableViewController.swift */; };
 		3D0F000D211CA480005D0DA2 /* EntryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0F000C211CA480005D0DA2 /* EntryTableViewCell.swift */; };
 		3D0F0010211CA617005D0DA2 /* EntryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0F000F211CA617005D0DA2 /* EntryDetailViewController.swift */; };
+		3D0F0012211CA6EF005D0DA2 /* Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0F0011211CA6EF005D0DA2 /* Entry.swift */; };
+		3D0F0014211CA7C3005D0DA2 /* EntryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0F0013211CA7C3005D0DA2 /* EntryController.swift */; };
 		3D0FFFF4211C9F67005D0DA2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0FFFF3211C9F67005D0DA2 /* AppDelegate.swift */; };
 		3D0FFFF9211C9F67005D0DA2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D0FFFF7211C9F67005D0DA2 /* Main.storyboard */; };
 		3D0FFFFB211C9F68005D0DA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D0FFFFA211C9F68005D0DA2 /* Assets.xcassets */; };
@@ -20,6 +22,8 @@
 		3D0F000A211CA2BD005D0DA2 /* EntriesTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntriesTableViewController.swift; sourceTree = "<group>"; };
 		3D0F000C211CA480005D0DA2 /* EntryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryTableViewCell.swift; sourceTree = "<group>"; };
 		3D0F000F211CA617005D0DA2 /* EntryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDetailViewController.swift; sourceTree = "<group>"; };
+		3D0F0011211CA6EF005D0DA2 /* Entry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entry.swift; sourceTree = "<group>"; };
+		3D0F0013211CA7C3005D0DA2 /* EntryController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryController.swift; sourceTree = "<group>"; };
 		3D0FFFF0211C9F67005D0DA2 /* ios-journal-REST.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ios-journal-REST.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D0FFFF3211C9F67005D0DA2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3D0FFFF8211C9F67005D0DA2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -59,6 +63,7 @@
 		3D0F0007211CA18A005D0DA2 /* Model Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				3D0F0013211CA7C3005D0DA2 /* EntryController.swift */,
 			);
 			path = "Model Controllers";
 			sourceTree = "<group>";
@@ -66,6 +71,7 @@
 		3D0F0008211CA1AB005D0DA2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				3D0F0011211CA6EF005D0DA2 /* Entry.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -181,6 +187,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D0F0014211CA7C3005D0DA2 /* EntryController.swift in Sources */,
+				3D0F0012211CA6EF005D0DA2 /* Entry.swift in Sources */,
 				3D0F000D211CA480005D0DA2 /* EntryTableViewCell.swift in Sources */,
 				3D0F000B211CA2BD005D0DA2 /* EntriesTableViewController.swift in Sources */,
 				3D0F0010211CA617005D0DA2 /* EntryDetailViewController.swift in Sources */,
